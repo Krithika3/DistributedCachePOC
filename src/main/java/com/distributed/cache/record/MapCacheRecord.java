@@ -1,21 +1,14 @@
 package com.distributed.cache.record;
 
 import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 
-public class MapCacheRecord<T> {
-	
-	private static final AtomicLong idGenerator = new AtomicLong(0L);
-	
+public class MapCacheRecord<T> extends CacheRecord {
+		
 	private final String key;
     private final T value;
     private final long revision;
     
-    private final long id;
-    private final long entryDate;
-    private volatile long lastHitDate;
-    private final AtomicInteger hitCount = new AtomicInteger(0);
+   
 
     public MapCacheRecord(final String key, final T value) {
         this(key, value, -1L);
@@ -25,11 +18,7 @@ public class MapCacheRecord<T> {
         this.key = key;
         this.value = value;
         this.revision = revision;
-        entryDate = System.currentTimeMillis();
-        lastHitDate = entryDate;
-        id = idGenerator.getAndIncrement();
     }
-
     public String getKey() {
         return key;
     }
@@ -38,26 +27,7 @@ public class MapCacheRecord<T> {
         return value;
     }
     
-    public long getEntryDate() {
-        return entryDate;
-    }
-
-    public long getLastHitDate() {
-        return lastHitDate;
-    }
-
-    public int getHitCount() {
-        return hitCount.get();
-    }
-
-    public void hit() {
-        hitCount.getAndIncrement();
-        lastHitDate = System.currentTimeMillis();
-    }
-
-    public long getId() {
-        return id;
-    }
+   
 
     @Override
     public int hashCode() {

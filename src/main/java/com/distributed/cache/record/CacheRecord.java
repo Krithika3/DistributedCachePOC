@@ -11,6 +11,8 @@ public class CacheRecord {
     private final long entryDate;
     private volatile long lastHitDate;
     private final AtomicInteger hitCount = new AtomicInteger(0);
+    
+    //private final Integer hitCount = 0;
 
     public CacheRecord() {
         entryDate = System.currentTimeMillis();

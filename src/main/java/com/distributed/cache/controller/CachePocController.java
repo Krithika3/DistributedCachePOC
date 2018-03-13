@@ -2,39 +2,42 @@ package com.distributed.cache.controller;
 
 import java.io.IOException;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.distributed.cache.hash.DistributedMapCache;
+import com.distributed.cache.eviction.EvictionPolicy;
+import com.distributed.cache.result.SimpleMapCache;
 
 @RestController
 @RequestMapping("/api/app/distributed/cache/v1")
 public class CachePocController {
-	
-	@Autowired
-	private DistributedMapCache distributedMapCache;
-	
-	@RequestMapping("getdata")
-	public String getData() throws IOException {
+
+	@RequestMapping("getdata/{key}")
+	public String getData(@PathVariable("key")String key) throws IOException {
 		
-				
-		distributedMapCache.put("test1", "value1");
-		distributedMapCache.put("test2", "value2");
-		distributedMapCache.put("test3", "value3");
-		System.out.println(distributedMapCache.get("test1"));
-		System.out.println(distributedMapCache.get("test2"));
-		distributedMapCache.put("test4", "value4");
-		distributedMapCache.put("test5", "value5");
+		SimpleMapCache<String> simpleMapCache = new SimpleMapCache<String>(3, EvictionPolicy.LRU);
 		
-		System.out.println(distributedMapCache.get("test4"));
-		
-		return distributedMapCache.get("test2");
-		
-		
-		
-		
+		setup(simpleMapCache);	
+		return simpleMapCache.get(key);
+			
 		
 	}
+	
+	public void setup( SimpleMapCache<String> simpleMapCache) throws IOException {
+		simpleMapCache.put("test1", "value1");
+		simpleMapCache.put("test2", "value2");
+		simpleMapCache.put("test3", "value3");
+		
+		//simpleMapCache.get("test1");
+		simpleMapCache.put("test4", "value4");
+		simpleMapCache.putIfAbsent("test2", "value2");
+
+		simpleMapCache.put("test5", "value5");
+		
+		System.out.println(simpleMapCache);
+		
+	}
+	
 
 }

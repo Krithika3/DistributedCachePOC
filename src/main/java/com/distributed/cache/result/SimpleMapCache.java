@@ -31,8 +31,10 @@ public class SimpleMapCache<T> implements MapCache<T> {
     } 
 
     private MapCacheRecord<T> evict() {
+    	
+    		System.out.println("Sorted map is" + sortedMap.values());
         if (cache.size() < maxSize) {
-            throw new RuntimeException("Cache size is less than max size");
+            return null;
         }
 
         final MapCacheRecord<T> recordToEvict = sortedMap.firstKey();
@@ -43,7 +45,7 @@ public class SimpleMapCache<T> implements MapCache<T> {
     }
 
     @Override
-    public MapPutResult<T> putIfAbsent(final String key, final T value) {
+    public void putIfAbsent(final String key, final T value) {
         writeLock.lock();
         try {
             final MapCacheRecord<T> record = cache.get(key);
@@ -55,14 +57,13 @@ public class SimpleMapCache<T> implements MapCache<T> {
             sortedMap.remove(record);
             record.hit();
             sortedMap.put(record, key);
-
-            return new MapPutResult<T>(false, record, record, null);
-        } finally {
+            
+              } finally {
             writeLock.unlock();
         }
     }
 
-    private MapPutResult<T> put(final String key, final T value, final MapCacheRecord<T> existing) {
+    private void put(final String key, final T value, final MapCacheRecord<T> existing) {
         // evict if we need to in order to make room for a new entry.
        MapCacheRecord<T> evicted =  evict();
 
@@ -77,16 +78,14 @@ public class SimpleMapCache<T> implements MapCache<T> {
         final MapCacheRecord<T> record = new MapCacheRecord<T>(key, value, revision);
         cache.put(key, record);
         sortedMap.put(record, key);
-
-        return new MapPutResult<T>(true, record, existing, evicted);
     }
 
     @Override
-    public MapPutResult<T> put(final String key, final T value) throws IOException {
+    public void put(final String key, final T value) throws IOException {
         writeLock.lock();
         try {
             final MapCacheRecord<T> existing = cache.get(key);
-            return put(key, value, existing);
+            put(key, value, existing);
         } finally {
             writeLock.unlock();
         }
@@ -111,6 +110,7 @@ public class SimpleMapCache<T> implements MapCache<T> {
         }
     }
 
+
     @Override
     public T get(final String key) {
         readLock.lock();
@@ -119,11 +119,12 @@ public class SimpleMapCache<T> implements MapCache<T> {
             if (record == null) {
                 return null;
             }
-
+            
+            
             sortedMap.remove(record);
             record.hit();
             sortedMap.put(record, key);
-
+            
             return record.getValue();
         } finally {
             readLock.unlock();

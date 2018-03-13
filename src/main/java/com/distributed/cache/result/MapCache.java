@@ -5,9 +5,9 @@ import java.io.IOException;
 
 public interface MapCache<T> {
 	
-	 	MapPutResult<T> putIfAbsent(String key, T value) throws IOException;
+	void putIfAbsent(String key, T value) throws IOException;
 
-	 	MapPutResult<T> put(String key, T value) throws IOException;
+	 	void put(String key, T value) throws IOException;
 
 	    boolean containsKey(String key) throws IOException;
 
