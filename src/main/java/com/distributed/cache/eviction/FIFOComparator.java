@@ -2,12 +2,12 @@ package com.distributed.cache.eviction;
 
 import java.util.Comparator;
 
-import com.distributed.cache.record.MapCacheRecord;
+import com.distributed.cache.record.CacheResult;
 
-public class FIFOComparator<T> implements Comparator<MapCacheRecord<T>> {
+public class FIFOComparator<T> implements Comparator<CacheResult<T>> {
 	
         @Override
-        public int compare(final MapCacheRecord<T> o1, final MapCacheRecord<T> o2) {
+        public int compare(final CacheResult<T> o1, final CacheResult<T> o2) {
             if (o1.equals(o2)) {
                 return 0;
             }

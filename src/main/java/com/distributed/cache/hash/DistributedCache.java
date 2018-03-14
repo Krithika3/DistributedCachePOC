@@ -7,16 +7,16 @@ import java.util.Map;
 import org.springframework.stereotype.Component;
 
 import com.distributed.cache.eviction.EvictionPolicy;
-import com.distributed.cache.result.SimpleMapCache;
+import com.distributed.cache.result.PocMapCache;
 
 @Component
 public class DistributedCache {
 	
-	private SimpleMapCache <String> simpleMapCache;
+	private PocMapCache <String> simpleMapCache;
 	
 	
 	public DistributedCache(){
-		 simpleMapCache = new SimpleMapCache<String>(3, EvictionPolicy.LRU);
+		 simpleMapCache = new PocMapCache<String>(3, EvictionPolicy.LRU);
 	}
 	
 	
