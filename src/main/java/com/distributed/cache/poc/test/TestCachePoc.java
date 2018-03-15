@@ -26,19 +26,19 @@ public class TestCachePoc {
 
 		DistributedCache<String> distributedCache = new DistributedCache<String>(3, EvictionPolicy.LRU);
 		
-		ExecutorService executor = Executors.newFixedThreadPool(3);
+		ExecutorService executor = Executors.newFixedThreadPool(2);
 
 		executor.submit(()-> distributedCache.put("test1", "value1"));
 		executor.submit(()-> distributedCache.put("test2", "value2"));
 		executor.submit(()-> distributedCache.put("test3", "value3"));
-		executor.submit(()-> System.out.println(distributedCache.get("test1")));
+		executor.submit(()-> System.out.println("Value of key test2:" +distributedCache.get("test1")));
 		executor.submit(()-> distributedCache.put("test2", "value5"));
 		executor.submit(()-> distributedCache.put("test4", "value4"));
 
-		executor.submit(()-> System.out.println(distributedCache.get("test2")));
-		executor.submit(()-> System.out.println(distributedCache.get("test3")));
-		executor.submit(()-> System.out.println(distributedCache.get("test1")));
-		executor.submit(()-> System.out.println(distributedCache.get("test4")));
+		executor.submit(()-> System.out.println("Value of key test2:" +distributedCache.get("test2")));
+		executor.submit(()-> System.out.println("Value of key test3:" +distributedCache.get("test3")));
+		executor.submit(()-> System.out.println("Value of key test1:" +distributedCache.get("test1")));
+		executor.submit(()-> System.out.println("Value of key test4:" +distributedCache.get("test4")));
 
 		stop(executor);
 	
