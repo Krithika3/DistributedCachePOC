@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.distributed.cache.database.repository.PersonRepositoryService;
 import com.distributed.cache.eviction.EvictionPolicy;
-import com.distributed.cache.result.DistributedCache;
+import com.distributed.cache.result.DistributedCacheImpl;
 
 @RestController
 @RequestMapping("/api/app/distributed/cache/v1")
@@ -24,7 +24,7 @@ public class CachePocController {
 	@Autowired
 	private PersonRepositoryService personRepositoryService;
 
-	private DistributedCache<Map<String, Object>> distributedMapCache = new DistributedCache<Map<String, Object>>(3,
+	private DistributedCacheImpl<Map<String, Object>> distributedMapCache = new DistributedCacheImpl<Map<String, Object>>(3,
 			EvictionPolicy.LRU);
 
 	@RequestMapping("getdata/id/{id}")

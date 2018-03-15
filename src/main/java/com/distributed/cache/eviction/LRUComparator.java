@@ -12,8 +12,8 @@ public class LRUComparator<T> implements Comparator<CacheResult<T>> {
 			return 0;
 		}
 
-		final int lastHitDateComparison = Integer.compare(o1.getHitCount(), o2.getHitCount());
-		return (lastHitDateComparison == 0 ? Long.compare(o1.getId(), o2.getId()) : lastHitDateComparison);
+		final int lastHitCountComparison = Integer.compare(o1.getHitCount(), o2.getHitCount());
+		return (lastHitCountComparison == 0 ? Long.compare(o1.getId(), o2.getId()) : lastHitCountComparison);
 	}
 
 }

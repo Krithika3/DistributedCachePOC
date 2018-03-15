@@ -6,10 +6,11 @@ import com.distributed.cache.result.CacheResult;
 
 public enum EvictionPolicy {
 	/*
-	 * An enum class to determine the order of eviction
+	 * An enum to determine the order of eviction
 	 */
 
-	LRU(new LRUComparator()), FIFO(new FIFOComparator());
+	LRU(new LRUComparator()), 
+	FIFO(new FIFOComparator());
 
 	private final Comparator<CacheResult> comparator;
 
