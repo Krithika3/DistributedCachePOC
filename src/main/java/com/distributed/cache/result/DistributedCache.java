@@ -12,7 +12,8 @@ import com.distributed.cache.eviction.EvictionPolicy;
 
 public class DistributedCache<T> implements MapCache<T> {
 	/*
-	 * A poc for a simple cache using locks to make sure it works in a distributed environment.
+	 * A poc for a simple cache using locks to make sure it works in a distributed
+	 * environment.
 	 */
 
 	private final Map<String, CacheResult<T>> cache = new HashMap<>();
@@ -42,60 +43,58 @@ public class DistributedCache<T> implements MapCache<T> {
 	}
 
 	@Override
-	public  MapCacheResult putIfAbsent(final String key, final T value) {
+	public void putIfAbsent(final String key, final T value) {
 		writeLock.lock();
 		try {
 			final CacheResult<T> record = cache.get(key);
 			if (record == null) {
-				 return put(key, value, record);
+				put(key, value, record);
+				return;
 			}
 			sortedMap.remove(record);
 			record.hit();
 			sortedMap.put(record, key);
-			
-			return new MapCacheResult(false, record, record, null);
 
 		} finally {
 			writeLock.unlock();
 		}
 	}
 
-	private MapCacheResult put(final String key, final T value, final CacheResult<T> existing) {
-		
+	private void put(final String key, final T value, final CacheResult<T> existing) {
+
 		CacheResult evicted = null;
 		final long revision;
-        if (existing == null) {
-            revision = 0;
-            evicted=evict();
-        }
+		if (existing == null) {
+			revision = 0;
+			evicted = evict();
+		}
 
-        else {
-        	
-            revision = existing.getRevision() + 1;
-            sortedMap.remove(existing);
-        }
+		else {
+
+			revision = existing.getRevision() + 1;
+			sortedMap.remove(existing);
+		}
 
 		final CacheResult<T> record = new CacheResult<T>(key, value, revision);
 		cache.put(key, record);
 		sortedMap.put(record, key);
-		
-		return new MapCacheResult(true, record, existing, evicted);
+
 	}
 
 	@Override
-	public  MapCacheResult put(final String key, final T value) {
+	public void put(final String key, final T value) {
 		writeLock.lock();
 		try {
 			final CacheResult<T> existing = cache.get(key);
-			return put(key, value, existing);
-		}
-				finally {
+			put(key, value, existing);
+			return;
+		} finally {
 			writeLock.unlock();
 		}
 	}
 
 	@Override
-	public  boolean containsKey(final String key) {
+	public boolean containsKey(final String key) {
 		readLock.lock();
 		try {
 			final CacheResult<T> record = cache.get(key);
@@ -114,7 +113,7 @@ public class DistributedCache<T> implements MapCache<T> {
 	}
 
 	@Override
-	public  T get(final String key) {
+	public T get(final String key) {
 		readLock.lock();
 		try {
 			final CacheResult<T> record = cache.get(key);
