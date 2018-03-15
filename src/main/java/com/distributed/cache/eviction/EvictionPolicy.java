@@ -2,23 +2,23 @@ package com.distributed.cache.eviction;
 
 import java.util.Comparator;
 
-import com.distributed.cache.record.CacheResult;
-
+import com.distributed.cache.result.CacheResult;
 
 public enum EvictionPolicy {
+	/*
+	 * An enum class to determine the order of eviction
+	 */
 
-    //LFU(new LFUComparator()),
-    LRU(new LRUComparator()),
-    FIFO(new FIFOComparator());
+	LRU(new LRUComparator()), FIFO(new FIFOComparator());
 
-    private final Comparator<CacheResult> comparator;
+	private final Comparator<CacheResult> comparator;
 
-    private EvictionPolicy(final Comparator<CacheResult> comparator) {
-        this.comparator = comparator;
-    }
+	private EvictionPolicy(final Comparator<CacheResult> comparator) {
+		this.comparator = comparator;
+	}
 
-    public Comparator<CacheResult> getComparator() {
-        return comparator;
-    }
+	public Comparator<CacheResult> getComparator() {
+		return comparator;
+	}
 
 }

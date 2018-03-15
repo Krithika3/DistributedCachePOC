@@ -1,4 +1,4 @@
-package com.distributed.cache.record;
+package com.distributed.cache.result;
 
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -8,7 +8,7 @@ public class CacheResult<T>{
 		
 	private final String key;
     private final T value;
-   // private final long revision;
+    private final long revision;
     
     private static final AtomicLong idGenerator = new AtomicLong(0L);
 
@@ -19,14 +19,14 @@ public class CacheResult<T>{
     
    
 
-//    public MapCacheRecord(final String key, final T value) {
-//        this(key, value);
-//    }
-
     public CacheResult(final String key, final T value) {
+        this(key, value, -1L);
+    }
+
+    public CacheResult(final String key, final T value, final long revision) {
         this.key = key;
         this.value = value;
-      //  this.revision = revision;
+        this.revision = revision;
         entryDate = System.currentTimeMillis();
         lastHitDate = entryDate;
         id = idGenerator.getAndIncrement();
@@ -80,8 +80,9 @@ public class CacheResult<T>{
         return false;
     }
 
-//    public long getRevision() {
-//        return revision;
-//    }
+	public long getRevision() {
+		return revision;
+	}
+
 
 }

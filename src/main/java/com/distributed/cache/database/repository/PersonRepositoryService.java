@@ -1,4 +1,4 @@
-package com.distributed.cache.repository;
+package com.distributed.cache.database.repository;
 
 import java.util.List;
 import java.util.Map;
@@ -17,14 +17,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class PersonRepositoryService {	
-	
+public class PersonRepositoryService {
+
 	private static SqlSessionFactory sesFact = null;
-	
+
 	@Autowired
 	private DataSourceConfigUtil dataSourceConfigUtil;
 
-	
 	public Map<String, Object> getMapData(String id) {
 
 		sesFact = getSession();
@@ -38,7 +37,7 @@ public class PersonRepositoryService {
 
 		return data;
 	}
-	
+
 	public List<Map<String, Object>> getListData() {
 
 		sesFact = getSession();
@@ -52,7 +51,7 @@ public class PersonRepositoryService {
 
 		return data;
 	}
-	
+
 	private SqlSessionFactory getSession() {
 		Properties prop = dataSourceConfigUtil.getProperties();
 		MysqlDataSourceFactory mdsf = new MysqlDataSourceFactory();
@@ -69,6 +68,4 @@ public class PersonRepositoryService {
 		return sesFact;
 	}
 
-
-	
 }

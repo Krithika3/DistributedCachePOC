@@ -1,6 +1,5 @@
 package com.distributed.cache.result;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedMap;
@@ -10,9 +9,11 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import com.distributed.cache.eviction.EvictionPolicy;
-import com.distributed.cache.record.CacheResult;
 
-public class PocMapCache<T> implements MapCache<T> {
+public class DistributedCache<T> implements MapCache<T> {
+	/*
+	 * A poc for a simple cache using locks to make sure it works in a distributed environment.
+	 */
 
 	private final Map<String, CacheResult<T>> cache = new HashMap<>();
 	private final SortedMap<CacheResult<T>, String> sortedMap;
@@ -23,7 +24,7 @@ public class PocMapCache<T> implements MapCache<T> {
 
 	private final int maxSize;
 
-	public PocMapCache(final int maxSize, final EvictionPolicy evictionPolicy) {
+	public DistributedCache(final int maxSize, final EvictionPolicy evictionPolicy) {
 		sortedMap = new ConcurrentSkipListMap<>(evictionPolicy.getComparator());
 		this.maxSize = maxSize;
 	}
@@ -41,49 +42,60 @@ public class PocMapCache<T> implements MapCache<T> {
 	}
 
 	@Override
-	public void putIfAbsent(final String key, final T value) {
+	public  MapCacheResult putIfAbsent(final String key, final T value) {
 		writeLock.lock();
 		try {
 			final CacheResult<T> record = cache.get(key);
 			if (record == null) {
-				put(key, value, record);
-				return;
+				 return put(key, value, record);
 			}
 			sortedMap.remove(record);
 			record.hit();
 			sortedMap.put(record, key);
+			
+			return new MapCacheResult(false, record, record, null);
 
 		} finally {
 			writeLock.unlock();
 		}
 	}
 
-	private void put(final String key, final T value, final CacheResult<T> existing) {
-		evict();
+	private MapCacheResult put(final String key, final T value, final CacheResult<T> existing) {
+		
+		CacheResult evicted = null;
+		final long revision;
+        if (existing == null) {
+            revision = 0;
+            evicted=evict();
+        }
 
-		if (existing != null) {
-			sortedMap.remove(existing);
-		}
+        else {
+        	
+            revision = existing.getRevision() + 1;
+            sortedMap.remove(existing);
+        }
 
-		final CacheResult<T> record = new CacheResult<T>(key, value);
+		final CacheResult<T> record = new CacheResult<T>(key, value, revision);
 		cache.put(key, record);
 		sortedMap.put(record, key);
+		
+		return new MapCacheResult(true, record, existing, evicted);
 	}
 
 	@Override
-	public void put(final String key, final T value) throws IOException {
+	public  MapCacheResult put(final String key, final T value) {
 		writeLock.lock();
 		try {
 			final CacheResult<T> existing = cache.get(key);
-			put(key, value, existing);
-			return;
-		} finally {
+			return put(key, value, existing);
+		}
+				finally {
 			writeLock.unlock();
 		}
 	}
 
 	@Override
-	public boolean containsKey(final String key) {
+	public  boolean containsKey(final String key) {
 		readLock.lock();
 		try {
 			final CacheResult<T> record = cache.get(key);
@@ -102,7 +114,7 @@ public class PocMapCache<T> implements MapCache<T> {
 	}
 
 	@Override
-	public T get(final String key) {
+	public  T get(final String key) {
 		readLock.lock();
 		try {
 			final CacheResult<T> record = cache.get(key);

@@ -1,4 +1,4 @@
-package com.distributed.cache.repository;
+package com.distributed.cache.database.repository;
 	
 	import java.util.Properties;
 	import javax.sql.DataSource;
