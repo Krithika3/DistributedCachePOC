@@ -22,17 +22,16 @@ public class TestCachePoc {
 
 	public static void main(String[] args) throws IOException {
 
-		DistributedCache<String> distributedCache = new DistributedCacheImpl<String>(3, EvictionPolicy.LRU);
+		DistributedCache<String> distributedCache = new DistributedCacheImpl<String>(2, EvictionPolicy.LRU);
 
-		ExecutorService executor = Executors.newFixedThreadPool(3);
+	
+		ExecutorService executor = Executors.newFixedThreadPool(2);
 
-		executor.submit(() -> distributedCache.put("test1", "value1"));
-		executor.submit(() -> distributedCache.put("test2", "value2"));
-		executor.submit(() -> distributedCache.put("test3", "value3"));
-
-		executor.submit(() -> distributedCache.putIfAbsent("test2", "value5"));
-		executor.submit(() -> distributedCache.remove("test2"));
-		executor.submit(() -> distributedCache.put("test4", "value4"));
+		 executor.submit(() -> distributedCache.put("test1", "value1"));
+		 executor.submit(() -> distributedCache.put("test2", "value2"));
+		 sleep(1);
+		 executor.submit(() -> distributedCache.get("test1"));
+		 executor.submit(() -> distributedCache.putIfAbsent("test3", "value5"));
 
 		executor.submit(() -> System.out.println("Value of key test2:" + distributedCache.get("test2")));
 		executor.submit(() -> System.out.println("Value of key test1:" + distributedCache.get("test1")));
